@@ -1,0 +1,150 @@
+#define _CRT_SECURE_NO_WARNINGS // scanf 함수를 사용하였을때 오류가 떠서 오류창을 띄우지 않기 위해 사용
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct table           // table이라는 구조체를 만들어 이름을 담을 배열과 횟수, 점수, 순위를 나타낼 변수 선언
+{
+	char name[20];
+	int count;
+	int score;
+	int rank;
+};
+double count = 0;      //인원수를 입력받을 변수를 전역변수로 선언
+int member;
+
+int correct(z);       //정답을 맞혔을때 점수를 계산할 함수 선언
+int main()
+{
+	int i, j;
+	int A;
+	struct table result[4];             // 반복문에서 사용할 반복변수와 플레이어의 이름, 점수, 횟수, 순위 등을 담을 배열 선언
+
+	printf("게임을 시작하고 싶으면 1번을 누르세요.\n");      //게임의 시작을 알림
+	scanf("%d", &A);
+	if(A==1)
+	{
+		printf("==게임시작==\n");                    
+		printf("인원수 입력:");
+		scanf("%d", &member);                     //인원수를 입력받음
+
+
+
+		for (i = 0; i < member; i++)
+		{
+			int solution = rand() % 101;
+
+			char player[20];
+			printf("플레이어%d : ", i + 1);
+			scanf("%s", &player);                      // 플레이어의 이름을 입력받고 난수 생성
+
+			for (j = 1; j <= 20; j++)
+			{
+				int a;
+				printf("%d번 남았습니다.\n", 21 - j);
+				printf("정답은? (100이하의 양의 정수) : ");
+				scanf("%d", &a);                                    // 숫자를 반복적으로 입력받으며 횟수를 센다
+				if (a >= 0 && a <= 100)
+				{
+					if (a == solution)
+					{
+						printf("정답입니다.\n 점수를 계산중입니다. \n");
+						count = j;
+						result[i].score = correct(j);
+						break;
+					}
+					else if (a < solution)
+					{
+						printf("답보다 작습니다.\n");
+					}
+					else if (a > solution)
+					{
+						printf("답보다 큽니다.\n");
+					}
+					if ((j == 20) && (a != solution))
+					{
+						printf("답을 맞추지 못했습니다.\n 점수를 계산중입니다. \n");
+						count = 0;
+						if ((a == (solution + 4)) || (a == (solution - 4)))
+						{
+							result[i].score = 22;
+						}
+						else if ((a == (solution + 3)) || (a == (solution - 3)))
+						{
+							result[i].score = 24;
+						}
+						else if ((a == (solution + 2)) || (a == (solution - 2)))
+						{
+							result[i].score = 26;
+						}
+						else if ((a == (solution + 1)) || (a == (solution - 1)))
+						{
+							result[i].score = 28;
+						}
+						else
+						{
+							result[i].score = 20;                                              // 입력받은 수와 정답을 비교하며 점수를 계산
+						}
+
+					}
+				}
+				else
+				{
+					printf("100이하의 양의 정수를 입력하십시오.\n");                      
+					return 0;                                                          // 입력받은 수가 조건에 맞지 않을 경우 프로그램 종료
+				}
+			}
+			result[i].count = count;
+
+			strcpy(result[i].name, player);
+			result[i].rank = 1;                                                               
+		}
+		printf("============결과===========\n");
+		printf("| 이름 | 맞춘 횟수 | 점수 |\n");
+		printf("===========================\n");
+		for (i = 0; i < member; i++)
+		{
+			printf("|%s|     %d     |  %d  |\n", (*(result + i)).name, (*(result + i)).count, (*(result + i)).score);
+			printf("---------------------------\n");                              //결과표 출력
+		}
+		for (i = 0; i < member; i++)
+		{
+			for (j = 0; j < member; j++)
+			{
+				if (result[i].score < result[j].score)
+				{
+					result[i].rank++;
+				}
+			}
+		}
+		printf("============순위===========\n");
+		printf("| 이름 |   순위    | 점수 |\n");
+		printf("===========================\n");
+		for (i = 1; i <= member; i++)
+		{
+			for (j = 0; j < member; j++)
+			{
+				if (result[j].rank == i)
+				{
+					printf("|%s|     %d     |  %d  |\n", (*(result + j)).name, (*(result + j)).rank, (*(result + j)).score);
+					printf("---------------------------\n");
+				}
+			}                                                                    //순위 출력
+		}
+		printf("게임을 종료합니다.\n");
+	}
+	else
+	{
+	printf("게임을 종료합니다.\n");                                         //1이 아닌 수를 입력받았을 때 프로그램 종료
+	}
+	
+	return 0;
+}
+
+
+int correct(z)                                 //정답을 맞혔을때 점수를 계산하는 함수 
+{
+	int res;
+	res = 100 - 3 * z;
+	return res;
+}
